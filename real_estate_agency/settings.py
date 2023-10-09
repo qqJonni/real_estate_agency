@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    "phonenumber_field",
 
     'property.apps.PropertyConfig',
 ]
@@ -100,3 +101,5 @@ DATABASES = {
         os.getenv('DATABASE', 'sqlite:///db.sqlite3')
     ),
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
