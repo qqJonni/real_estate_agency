@@ -74,5 +74,5 @@ class Owner(models.Model):
     flat_in_owner = models.ManyToManyField(Flat, related_name='flats_in_owner', verbose_name='Квартиры в собственности')
 
     def __str__(self):
-        return self.full_name, self.owner_pure_phone_number
+        return self.full_name
 
