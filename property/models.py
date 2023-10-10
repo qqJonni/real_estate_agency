@@ -11,7 +11,7 @@ class Flat(models.Model):
         (None, 'Не заполнено')
     )
     owner = models.CharField('ФИО владельца', max_length=200)
-    owner_pure_phone = PhoneNumberField(blank=True)
+    owner_pure_phone = PhoneNumberField(blank=True, verbose_name='Нормализованный номер владельца')
     owners_phonenumber = models.CharField('Номер владельца', max_length=20)
     new_building = models.BooleanField(choices=BOOL_CHOICES)
     created_at = models.DateTimeField(
@@ -65,6 +65,13 @@ class Complaint(models.Model):
     number_flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name='Квартира, на которую пожаловались')
     like = models.ManyToManyField(User, related_name='likes', verbose_name='Кто лайкнул')
     description = models.TextField(verbose_name='Текст жалобы')
+
+
+class Owner(models.Model):
+    full_name = models.CharField(max_length=128, verbose_name='ФИО владельца')
+    phone_number_owner = models.CharField(max_length=128, verbose_name='Номер владельца')
+    owner_pure_phone_number = PhoneNumberField(blank=True, verbose_name='Нормализованный номер владельца')
+    flat_in_owner = models.ManyToManyField(Flat, related_name='flats_in_owner', verbose_name='Квартиры в собственности')
 
 
 
