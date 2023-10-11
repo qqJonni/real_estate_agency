@@ -6,13 +6,14 @@ import phonenumbers
 
 def change_phone_number(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
-    for number in Flat.objects.all():
-        current_number = number.owners_phonenumber
+
+    for flat in Flat.objects.all().iterator():
+        current_number = flat.owners_phonenumber
         if phonenumbers.is_valid_number(phonenumbers.parse(current_number, 'RU')):
             correct_number = phonenumbers.parse(current_number, 'RU')
-            new_number = correct_number.national_number
-            number.owner_pure_phone = f'+7{new_number}'
-            number.save()
+            new_number = phonenumbers.format_number(correct_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+            flat.owner_pure_phone = new_number
+            flat.save()
 
 
 class Migration(migrations.Migration):
@@ -24,6 +25,4 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(change_phone_number)
     ]
-
-
 

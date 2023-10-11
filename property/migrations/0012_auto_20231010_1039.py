@@ -6,8 +6,10 @@ from django.db import migrations, IntegrityError
 def owner_create(apps, schema_editor):
     Owner = apps.get_model('property', 'Owner')
     Flat = apps.get_model('property', 'Flat')
+
     try:
-        for flat in Flat.objects.all():
+        flats = Flat.objects.all().iterator()
+        for flat in flats:
             obj, created = Owner.objects.get_or_create(full_name=flat.owner,
                                                        phone_number_owner=flat.owners_phonenumber,
                                                        owner_pure_phone_number=flat.owner_pure_phone,
@@ -15,7 +17,7 @@ def owner_create(apps, schema_editor):
             obj.flat_in_owner.add(flat)
     except IntegrityError:
         pass
-
+    
 
 class Migration(migrations.Migration):
 
