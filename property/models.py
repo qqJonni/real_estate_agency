@@ -5,15 +5,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Flat(models.Model):
-    BOOL_CHOICES = (
-        (True, 'Новостройка'),
-        (False, 'Старое здание'),
-        (None, 'Не заполнено')
-    )
-    owner = models.CharField('ФИО владельца', max_length=200)
-    owner_pure_phone = PhoneNumberField(blank=True, verbose_name='Нормализованный номер владельца')
-    owners_phonenumber = models.CharField('Номер владельца', max_length=20)
-    new_building = models.BooleanField(choices=BOOL_CHOICES)
     created_at = models.DateTimeField(
         'Когда создано объявление',
         default=timezone.now,
@@ -48,23 +39,33 @@ class Flat(models.Model):
         blank=True,
         db_index=True)
 
-    has_balcony = models.BooleanField('Наличие балкона', db_index=True, null=True)
+    has_balcony = models.BooleanField('Наличие балкона', db_index=True)
     active = models.BooleanField('Активно-ли объявление', db_index=True)
     construction_year = models.IntegerField(
         'Год постройки здания',
         null=True,
         blank=True,
         db_index=True)
+    new_building = models.BooleanField('Является ли объект новостройкой',
+                                       blank=True, null=True)
+    liked_by = models.ManyToManyField(User, related_name="liked_flats",
+                                      verbose_name='Кто лайкнул:',
+                                      blank=True)
 
     def __str__(self):
         return f'{self.town}, {self.address} ({self.price}р.)'
 
 
 class Complaint(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Кто жаловался')
-    number_flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name='Квартира, на которую пожаловались')
+    user = models.ForeignKey(User, unique=True, on_delete=models.CASCADE, verbose_name='Кто жаловался:',
+                             related_name='users_who_complained')
+    number_flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name='Квартира, на которую жалуются:',
+                                    related_name='complaints', null=True)
     like = models.ManyToManyField(User, related_name='likes', verbose_name='Кто лайкнул')
     description = models.TextField(verbose_name='Текст жалобы')
+
+    def __str__(self):
+        return f'{self.user}, {self.number_flat}'
 
 
 class Owner(models.Model):
